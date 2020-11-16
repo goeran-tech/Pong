@@ -12,6 +12,9 @@ screen = pg.display.set_mode((size, size))
 pressed_up = False
 pressed_down = False
 
+def is_collided_with(self, sprite):
+    return self.rect.colliderect(sprite.rect)
+
 while not done:
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -32,7 +35,23 @@ while not done:
     if pressed_up:
         player1[1] -= 5
     if pressed_down:
-        player1[1] += 5 
+        player1[1] += 5
+
+    if ball[2] == 270:
+        ball[0] -= 15
+    if ball[2] == 90:
+        ball[0] += 15
+
+    player1Obj = pg.draw.rect(screen, (255,255,255), (player1[0], player1[1], 25, 200))
+    player2Obj = pg.draw.rect(screen, (255,255,255), (player2[0], player2[1], 25, 200))
+
+    ballObj = pg.draw.rect(screen, (255,255,255), (ball[0], ball[1], 25, 25))
+
+    if player1Obj.colliderect(ballObj):
+        ball[2] = 90
+
+    if player2Obj.colliderect(ballObj):
+        ball[2] = 270
 
     screen.fill((0, 0, 0))
     pg.draw.rect(screen, (255,255,255), (player1[0], player1[1], 25, 200))
