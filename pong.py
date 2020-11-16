@@ -1,62 +1,88 @@
-import pygame as pg
+import pygame, sys, random
 
-pg.init()
-size = 800
-done = False
-player1 = [25, size/2-100]
-player2 = [size-50, size/2-100]
-ball = [size/2-12, size/2-12, 270]
-clock = pg.time.Clock()
-pg.display.set_caption('Pong') 
-screen = pg.display.set_mode((size, size))
-pressed_up = False
-pressed_down = False
+def ball_movement():
+    global ball_speed_x, ball_speed_y
+    if ball.top <= 0 or ball.bottom >= SCREEN_HEIGHT:
+        ball_speed_y *= -1
+    if ball.left <= 0 or ball.right >= SCREEN_WIDTH:
+        ball_restart()
 
-def is_collided_with(self, sprite):
-    return self.rect.colliderect(sprite.rect)
+    if ball.colliderect(player) or ball.colliderect(opponent):
+        ball_speed_x *= -1
 
-while not done:
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            done = True
+def player_movement():
+    player.y += player_speed
+    if player.top <= 0:
+        player.top = 0
+    if player.bottom >= SCREEN_HEIGHT:
+        player.bottom = SCREEN_HEIGHT
 
-        if event.type == pg.KEYDOWN:                   
-            if event.key == pg.K_w:        
-                pressed_up = True
-            elif event.key == pg.K_s:    
-                pressed_down = True
+def opponent_movement():
+    if opponent.top < ball.y:
+        opponent.top += opponent_speed
+    if opponent.bottom > ball.y:
+        opponent.bottom -= opponent_speed
+    if opponent.top <= 0:
+        opponent.top = 0
+    if opponent.bottom >= SCREEN_HEIGHT:
+        opponent.bottom = SCREEN_HEIGHT
 
-        if event.type == pg.KEYUP:           
-            if event.key == pg.K_w:        
-                pressed_up = False
-            elif event.key == pg.K_s:   
-                pressed_down = False   
+def ball_restart():
+    global ball_speed_x, ball_speed_y
+    ball.center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+    ball_speed_y *= random.choice((1, -1))
+    ball_speed_x *= random.choice((1, -1))
 
-    if pressed_up:
-        player1[1] -= 5
-    if pressed_down:
-        player1[1] += 5
+pygame.init()
+clock = pygame.time.Clock()
 
-    if ball[2] == 270:
-        ball[0] -= 15
-    if ball[2] == 90:
-        ball[0] += 15
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 960
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption('Pong') 
 
-    player1Obj = pg.draw.rect(screen, (255,255,255), (player1[0], player1[1], 25, 200))
-    player2Obj = pg.draw.rect(screen, (255,255,255), (player2[0], player2[1], 25, 200))
+ball = pygame.Rect(SCREEN_WIDTH/2 - 15, SCREEN_HEIGHT/2-15, 30, 30)
+player = pygame.Rect(10, SCREEN_HEIGHT/2-70, 10, 140)
+opponent = pygame.Rect(SCREEN_WIDTH - 20, SCREEN_HEIGHT/2-70, 10, 140)
 
-    ballObj = pg.draw.rect(screen, (255,255,255), (ball[0], ball[1], 25, 25))
+bg_color = pygame.Color("grey12")
+light_grey = (200, 200, 200)
 
-    if player1Obj.colliderect(ballObj):
-        ball[2] = 90
+ball_speed_x = 10 * random.choice((1, -1))
+ball_speed_y = 10 * random.choice((1, -1))
+opponent_speed = 10
+player_speed = 0
 
-    if player2Obj.colliderect(ballObj):
-        ball[2] = 270
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_s:
+                player_speed += 10
+            if event.key == pygame.K_w:
+                player_speed -= 10
 
-    screen.fill((0, 0, 0))
-    pg.draw.rect(screen, (255,255,255), (player1[0], player1[1], 25, 200))
-    pg.draw.rect(screen, (255,255,255), (player2[0], player2[1], 25, 200))
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_s:
+                player_speed -= 10
+            if event.key == pygame.K_w:
+                player_speed += 10
 
-    pg.draw.rect(screen, (255,255,255), (ball[0], ball[1], 25, 25))
-    pg.display.update()
+    ball.x += ball_speed_x
+    ball.y += ball_speed_y
+
+    ball_movement()
+    player_movement()
+    opponent_movement()
+
+    screen.fill(bg_color)
+    pygame.draw.rect(screen, light_grey, player)
+    pygame.draw.rect(screen, light_grey, opponent)
+    pygame.draw.ellipse(screen, light_grey, ball)
+    pygame.draw.aaline(screen, light_grey, (SCREEN_WIDTH/2, 0), (SCREEN_WIDTH/2, SCREEN_HEIGHT))
+
+    pygame.display.flip()
     clock.tick(30)
