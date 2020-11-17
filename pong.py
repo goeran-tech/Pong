@@ -9,6 +9,7 @@ def ball_movement():
 
     if ball.colliderect(player) or ball.colliderect(opponent):
         ball_speed_x *= -1
+        ball_speed_y *= random.choice((1, -1))
 
 def player_movement():
     player.y += player_speed
@@ -48,9 +49,10 @@ opponent = pygame.Rect(SCREEN_WIDTH - 20, SCREEN_HEIGHT/2-70, 10, 140)
 bg_color = pygame.Color("grey12")
 light_grey = (200, 200, 200)
 
-ball_speed_x = 10 * random.choice((1, -1))
-ball_speed_y = 10 * random.choice((1, -1))
-opponent_speed = 10
+ball_speed = 15
+ball_speed_x = ball_speed * random.choice((1, -1))
+ball_speed_y = ball_speed * random.choice((1, -1))
+opponent_speed = 15
 player_speed = 0
 
 while True:
@@ -61,15 +63,15 @@ while True:
         
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_s:
-                player_speed += 10
+                player_speed += 15
             if event.key == pygame.K_w:
-                player_speed -= 10
+                player_speed -= 15
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_s:
-                player_speed -= 10
+                player_speed -= 15
             if event.key == pygame.K_w:
-                player_speed += 10
+                player_speed += 15
 
     ball.x += ball_speed_x
     ball.y += ball_speed_y
