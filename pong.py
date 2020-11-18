@@ -1,11 +1,16 @@
 import pygame, sys, random
 
 def ball_movement():
-    global ball_speed_x, ball_speed_y
+    global ball_speed_x, ball_speed_y, player_score, opponent_score
     if ball.top <= 0 or ball.bottom >= SCREEN_HEIGHT:
         ball_speed_y *= -1
-    if ball.left <= 0 or ball.right >= SCREEN_WIDTH:
+    if ball.left <= 0:
         ball_restart()
+        opponent_score += 1
+    if ball.right >= SCREEN_WIDTH:
+        ball_restart()
+        player_score += 1
+
 
     if ball.colliderect(player) or ball.colliderect(opponent):
         ball_speed_x *= -1
@@ -55,7 +60,20 @@ ball_speed_y = ball_speed * random.choice((1, -1))
 opponent_speed = 15
 player_speed = 0
 
+player_score = 0
+opponent_score = 0
+
+font = pygame.font.Font('freesansbold.ttf', 64)
+
 while True:
+    playerText = font.render(str(player_score), True, light_grey, bg_color) 
+    playerTextRect = playerText.get_rect()
+    playerTextRect.center = (SCREEN_WIDTH/3, 40)
+
+    opponentText = font.render(str(opponent_score), True, light_grey, bg_color) 
+    opponentTextRect = opponentText.get_rect()
+    opponentTextRect.center = (SCREEN_WIDTH/3*2, 40)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -86,5 +104,8 @@ while True:
     pygame.draw.ellipse(screen, light_grey, ball)
     pygame.draw.aaline(screen, light_grey, (SCREEN_WIDTH/2, 0), (SCREEN_WIDTH/2, SCREEN_HEIGHT))
 
+    screen.blit(playerText, playerTextRect)
+    screen.blit(opponentText, opponentTextRect)
+    
     pygame.display.flip()
     clock.tick(30)
